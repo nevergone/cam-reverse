@@ -136,9 +136,10 @@ describe("parse packet", () => {
       suffix: "WONJM",
       serialU64: BigInt(156362),
       devId: "BATD156362WONJM",
+      encoded: false,
     };
 
-    assert.deepEqual(parse_PunchPkt(pkt), expected);
+    assert.deepEqual(parse_PunchPkt(pkt, false), expected);
   });
   {
     const in_pkt_str = "f14100145848410000000000000003e24b4d4d4542000000";
@@ -150,12 +151,13 @@ describe("parse packet", () => {
         suffix: "KMMEB",
         serialU64: BigInt(994),
         devId: "XHA994KMMEB",
+        encoded: false,
       };
-      assert.deepEqual(parse_PunchPkt(pkt), expected);
+      assert.deepEqual(parse_PunchPkt(pkt, false), expected);
     });
     // https://github.com/DavidVentura/cam-reverse/issues/17#issuecomment-2094819873
     it("replies properly to PunchPkt with 3-letters-long prefix", () => {
-      const dev = parse_PunchPkt(pkt);
+      const dev = parse_PunchPkt(pkt, false);
       const p2prdy = makeP2pRdy(dev);
       let p2pstr = BATohstr(p2prdy);
 

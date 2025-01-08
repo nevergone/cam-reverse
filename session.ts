@@ -153,7 +153,7 @@ export const makeSession = (
     rcvSeqId: 0,
     frame_is_bad: false,
     frame_was_fixed: false,
-    encoded: false,
+    encoded: dev.encoded,
     unackedDrw,
     close: () => {
       session.eventEmitter.emit("disconnect");
