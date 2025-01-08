@@ -13,7 +13,14 @@ import {
   notImpl,
   noop,
 } from "./handlers.js";
-import { create_P2pAlive, DevSerial, SendStartVideo, SendVideoResolution, SendWifiDetails } from "./impl.js";
+import {
+  create_P2pAlive,
+  create_PunchPkt,
+  DevSerial,
+  SendStartVideo,
+  SendVideoResolution,
+  SendWifiDetails
+} from "./impl.js";
 import { logger } from "./logger.js";
 
 export type Session = {
@@ -85,8 +92,10 @@ export const makeSession = (
   sock.on("message", (msg, rinfo) => handleIncoming(session, handlers, msg, rinfo));
 
   sock.on("listening", () => {
-    const buf = makeP2pRdy(dev);
-    session.send(buf);
+    session.send(makeP2pRdy(dev));
+    if (dev.encoded) {
+      session.send(makeP2pRdy(dev, create_PunchPkt));
+    }
     session.started = true;
   });
 

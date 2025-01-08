@@ -178,13 +178,21 @@ export const create_LanSearch = (): DataView => {
   return outbuf;
 };
 
-export const create_P2pRdy = (inbuf: DataView): DataView => {
+const create_P2pRdy_Like = (command: number, inbuf: DataView): DataView => {
   const P2PRDY_SIZE = 0x14;
   const outbuf = new DataView(new Uint8Array(P2PRDY_SIZE + 4).buffer);
-  outbuf.writeU16(Commands.P2pRdy);
+  outbuf.writeU16(command);
   outbuf.add(2).writeU16(P2PRDY_SIZE);
   outbuf.add(4).writeByteArray(new Uint8Array(inbuf.readByteArray(P2PRDY_SIZE).buffer));
   return outbuf;
+};
+
+export const create_P2pRdy = (inbuf: DataView): DataView => {
+  return create_P2pRdy_Like(Commands.P2pRdy, inbuf)
+};
+
+export const create_PunchPkt = (inbuf: DataView): DataView => {
+  return create_P2pRdy_Like(Commands.PunchPkt, inbuf)
 };
 
 export const create_P2pAlive = (): DataView => {
