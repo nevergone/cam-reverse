@@ -57,21 +57,36 @@ yargs(hideBin(process.argv))
     (yargs) => {
       return yargs
         .option("log_level", { describe: "Set log level", default: "info" })
+        .option("config_file", { describe: "Specify config file" })
         .option("discovery_ip", { describe: "Camera discovery IP address" })
         .option("ssid", { describe: "Wifi network for the camera to connect to" })
         .option("password", { describe: "Wifi network password" })
-        .demandOption(["ssid", "password"])
-        .string(["ssid", "password"]);
+        //.string(["ssid", "password"]);
+        .strict();
+
     },
     (argv) => {
+
+      if (argv.config_file !== undefined) {
+        loadConfig(argv.config_file);
+      }
+
       buildLogger(argv.log_level, undefined);
       if (majorVersion < 16) {
         logger.error(`Node version ${majorVersion} is not supported, may malfunction`);
       }
-      if (argv.discovery_ip !== undefined) {
-        config.discovery_ips = [argv.discovery_ip];
+      // always overwrite discovery ips for pairing to prevent using existing IPs
+      let pair_discovery_ips = (argv.discovery_ip !== undefined) ?
+        [argv.discovery_ip] :
+        ["192.168.1.255"];
+
+      if (argv.ssid !== undefined) {
+        config.ssid = argv.ssid;
       }
-      pair({ ssid: argv.ssid, password: argv.password });
+      if (argv.password !== undefined) {
+        config.password = argv.password;
+      }
+      pair({ ssid: config.ssid, password: config.password, discovery_ips: pair_discovery_ips });
     },
   )
   .command(
