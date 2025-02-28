@@ -16,6 +16,7 @@ interface CameraConfig {
   mirror?: boolean;
   audio?: boolean;
   fix_packet_loss?: boolean;
+  ip?: string;
 }
 
 interface AppConfig {
@@ -24,6 +25,8 @@ interface AppConfig {
   cameras: Record<string, CameraConfig>;
   discovery_ips: string[];
   blacklisted_ips: string[];
+  ssid: string;
+  password: string;
 }
 
 const DefaultConfig: AppConfig = {

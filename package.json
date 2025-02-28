@@ -3,7 +3,10 @@
   "scripts": {
     "test": "mocha tests",
     "tsc": "tsc",
-    "build": "esbuild cmd/bin.ts  --bundle --platform=node --outfile=dist/bin.cjs --target=node12 --loader:.gz=binary --loader:.html=text"
+    "build": "esbuild cmd/bin.ts  --bundle --platform=node --outfile=dist/bin.cjs --target=node12 --loader:.gz=binary --loader:.html=text",
+    "start-server": "node dist/bin.cjs http_server --config_file ./config.yml",
+    "single-capture": "node dist/bin.cjs frame --discovery_ip $DEVICE_IP --out $OUTFILE",
+    "pair": "node dist/bin.cjs pair --config_file ./config.yml"
   },
   "devDependencies": {
     "@types/yargs": "^17.0.32",
