@@ -7,11 +7,11 @@ import { DevSerial, SendListWifi } from "./impl.js";
 import { Handlers, makeSession, Session, configureWifi } from "./session.js";
 import { logger } from "./logger.js";
 
-export const pair = ({ ssid, password }: { ssid: string; password: string }) => {
+export const pair = ({ ssid, password, discovery_ips }: { ssid: string; password: string, discovery_ips: string[] }) => {
   logger.info(`Will configure any devices found to join ${ssid}`);
   let sessions: Record<string, Session> = {};
 
-  let devEv = discoverDevices(config.discovery_ips);
+  let devEv = discoverDevices(discovery_ips);
   if (password == "") {
     throw new Error("You must set a non-zero-length password");
   }
