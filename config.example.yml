@@ -1,12 +1,16 @@
 http_server:
   port: 5000
 
+ssid: "XX"
+password: "XX"
+
 logging:
   level: debug
   use_color: true
 
 cameras:
   FTYC477360FAWUK:
+    ip: "1.2.3.4"
     alias: "A9"
     rotate: 1
     mirror: false
