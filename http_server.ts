@@ -4,7 +4,7 @@ import http from "node:http";
 import { logger } from "./logger.js";
 import { config } from "./settings.js";
 import { discoverDevices } from "./discovery.js";
-import { DevSerial } from "./impl.js";
+import { DevSerial, SendDevStatus } from "./impl.js";
 import { Handlers, makeSession, Session, startVideoStream } from "./session.js";
 import { addExifToJpeg, createExifOrientation } from "./exif.js";
 
@@ -135,11 +135,24 @@ export const serveHttp = (port: number) => {
     }
   });
 
-  let devEv = discoverDevices(config.discovery_ips);
+  let discover = [...config.discovery_ips];
+
+  // add device IPs to discovery ip list
+  let cams = Object.keys(config.cameras);
+  for (let i = 0; i < cams.length; i++) {
+    if (config.cameras[cams[i]].ip !== undefined) {
+      discover.push(config.cameras[cams[i]].ip);
+    }
+  }
+
+  let devEv = discoverDevices(discover);
 
   const startSession = (s: Session) => {
     startVideoStream(s);
     logger.info(`Camera ${s.devName} is now ready to stream`);
+    // https://github.com/DavidVentura/cam-reverse/issues/29#issuecomment-2196653873
+    // battery status
+    s.send(SendDevStatus(s))
   };
 
   devEv.on("discover", (rinfo: RemoteInfo, dev: DevSerial) => {
