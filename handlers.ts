@@ -30,7 +30,7 @@ export const handle_P2PRdy = (session: Session, _: DataView) => {
   session.send(b);
 };
 
-export const makeP2pRdy = (dev: DevSerial): DataView => {
+export const makeP2pRdy = (dev: DevSerial, makefn: Function = create_P2pRdy): DataView => {
   const outbuf = new DataView(new Uint8Array(0x14).buffer); // 8 = serial u64
   // The protocol seems to expect 4 bytes -- check the regression test
   // `replies properly to PunchPkt with 3-letters-long prefix` for a case with a
@@ -39,7 +39,7 @@ export const makeP2pRdy = (dev: DevSerial): DataView => {
   outbuf.add(0).writeString(dev.prefix);
   outbuf.add(4).writeU64(dev.serialU64);
   outbuf.add(8 + devPrefixLength).writeString(dev.suffix);
-  return create_P2pRdy(outbuf);
+  return makefn(outbuf);
 };
 
 export const swVerToString = (swver: number): string => {
@@ -255,6 +255,7 @@ const deal_with_data = (session: Session, dv: DataView) => {
         // retransmit
         return;
       }
+      if (session.curImage.length == 0) return; // missed the start-of-frame packet
 
       let b = Buffer.from(data.buffer);
 
@@ -269,7 +270,7 @@ const deal_with_data = (session: Session, dv: DataView) => {
           return;
         }
 
-        if (session.curImage.length <= 1) return; // header does not have markers
+        if (session.curImage.length == 1) return; // header does not have markers
 
         let lastFrameSlice = session.curImage[session.curImage.length - 1];
         const lastResetMarker = findAllResetMarkers(lastFrameSlice).pop();

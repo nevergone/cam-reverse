@@ -178,13 +178,21 @@ export const create_LanSearch = (): DataView => {
   return outbuf;
 };
 
-export const create_P2pRdy = (inbuf: DataView): DataView => {
+const create_P2pRdy_Like = (command: number, inbuf: DataView): DataView => {
   const P2PRDY_SIZE = 0x14;
   const outbuf = new DataView(new Uint8Array(P2PRDY_SIZE + 4).buffer);
-  outbuf.writeU16(Commands.P2pRdy);
+  outbuf.writeU16(command);
   outbuf.add(2).writeU16(P2PRDY_SIZE);
   outbuf.add(4).writeByteArray(new Uint8Array(inbuf.readByteArray(P2PRDY_SIZE).buffer));
   return outbuf;
+};
+
+export const create_P2pRdy = (inbuf: DataView): DataView => {
+  return create_P2pRdy_Like(Commands.P2pRdy, inbuf)
+};
+
+export const create_PunchPkt = (inbuf: DataView): DataView => {
+  return create_P2pRdy_Like(Commands.PunchPkt, inbuf)
 };
 
 export const create_P2pAlive = (): DataView => {
@@ -201,8 +209,8 @@ export const create_P2pClose = (): DataView => {
   return outbuf;
 };
 
-export type DevSerial = { prefix: string; serial: string; suffix: string; serialU64: bigint; devId: string };
-export const parse_PunchPkt = (dv: DataView): DevSerial => {
+export type DevSerial = { prefix: string; serial: string; suffix: string; serialU64: bigint; devId: string, encoded: boolean };
+export const parse_PunchPkt = (dv: DataView, encoded: boolean): DevSerial => {
   const punchCmd = dv.readU16();
   const len = dv.add(2).readU16();
   const prefix = dv.add(4).readString(4);
@@ -211,5 +219,5 @@ export const parse_PunchPkt = (dv: DataView): DevSerial => {
   const suffix = dv.add(16).readString(len - 16 + 4); // 16 = offset, +4 header
   const devId = prefix + serial + suffix;
 
-  return { prefix, serial, suffix, serialU64, devId };
+  return { prefix, serial, suffix, serialU64, devId, encoded };
 };
